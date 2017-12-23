@@ -67,15 +67,16 @@ module.exports = function container(get, set, clear) {
           }
           const diff = myRate - otherRate;
           const relativeDiff = diff / high;
+          const absDiff = Math.abs(relativeDiff);
 
-          if ((high - low)/high > 0.002) {
+          if (absDiff > 0.004) {
             s.signal = signal;
           }
 
           s.arb = {
             myRate,
             otherRate,
-            diff,
+            diff: absDiff,
             relativeDiff
           }
         });

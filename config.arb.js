@@ -13,12 +13,12 @@ c.buy_stop_pct = 0;
 c.markup_pct = 1;
 c.max_sell_loss_pct = 3.8;
 c.max_slippage_pct = 2;
-c.order_adjust_time = 5000;
+c.order_adjust_time = 3000;
 // become a market taker (high fees) or a market maker (low fees)
 c.order_type = 'taker';
-c.period = '20s';
+c.period = '30s';
 // ms to poll new trades at
-c.poll_trades = 10000
+c.poll_trades = 15000;
 c.profit_stop_enable_pct = 0;
 c.profit_stop_pct = 0;
 c.rsi_periods = 14;
