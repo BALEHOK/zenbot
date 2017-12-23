@@ -1,0 +1,112 @@
+{
+    "options": {
+        "conf": "./config.arb.poloniex.js",
+        "days": 2,
+        "strategy": "arb",
+        "sell_stop_pct": 0,
+        "buy_stop_pct": 0,
+        "profit_stop_enable_pct": 0,
+        "profit_stop_pct": 0,
+        "max_slippage_pct": 2,
+        "buy_pct": 100,
+        "sell_pct": 100,
+        "order_adjust_time": 5000,
+        "max_sell_loss_pct": 3.8,
+        "markdown_buy_pct": 0,
+        "markup_sell_pct": 0,
+        "order_type": "maker",
+        "currency_capital": 0.009,
+        "asset_capital": 0,
+        "rsi_periods": 14,
+        "avg_slippage_pct": 0.045,
+        "start": 1513900800000,
+        "stats": false,
+        "show_options": true,
+        "verbose": false,
+        "selector": "poloniex.ETH-BTC",
+        "mode": "sim",
+        "mongo": {
+            "host": "localhost",
+            "port": 27017,
+            "db": "zenbot4",
+            "username": null,
+            "password": null,
+            "replicaSet": null
+        },
+        "order_poll_time": 5000,
+        "wait_for_settlement": 5000,
+        "post_only": true,
+        "poll_trades": 30000,
+        "symmetrical": false,
+        "balance_snapshot_period": "15m",
+        "cancel_after": "day",
+        "mongo_url": "mongodb://localhost:27017/zenbrain",
+        "mongo_username": null,
+        "mongo_password": null,
+        "kraken_key": "kWxx47wUcrkO5QSypHqN8AFwST9RrCsnjSjv/tPN1pnqdJCN2ELITszj",
+        "kraken_secret": "Vn5HHQk+ppxYx/4mbiugjRURrYLWDZk6t/Q2cLft2LewINTjVrHYjokz2JFPp18S+e7Ej/1xq+HCtax65mze0g==",
+        "poloniex_key": "JJMSVCR8-NCD3S45N-54IM19FY-HQ8SAU3K",
+        "poloniex_secret": "95c7444e663345e86366c3b4511b3ca9d4ef888bc2724acf65b46c01f094e51561a6c195d9c43ae1970738f1eb264d33c26ca5b646fd95f1d730c6a7b97a3302",
+        "trade_log": true,
+        "watch_exchanges": [
+            "kraken",
+            "poloniex"
+        ],
+        "graph_selectors": [
+            "kraken.XETH-XXBT",
+            "kraken.XXBT-ZEUR",
+            "poloniex.ETH-BTC",
+            "poloniex.BTC-EUR"
+        ],
+        "markup_pct": 1,
+        "period": "15s",
+        "paper": true,
+        "min_periods": 52
+    },
+    "selector": "poloniex.ETH-BTC",
+    "exchange": {
+        "name": "poloniex",
+        "historyScan": "backward",
+        "makerFee": 0.15,
+        "takerFee": 0.25
+    },
+    "product_id": "ETH-BTC",
+    "asset": "ETH",
+    "currency": "BTC",
+    "product": {
+        "asset": "ETH",
+        "currency": "BTC",
+        "min_total": "0.0001",
+        "max_size": null,
+        "increment": "0.00000001",
+        "label": "Ethereum/Bitcoin"
+    },
+    "balance": {
+        "asset": 0,
+        "currency": 0.009
+    },
+    "ctx": {},
+    "lookback": [],
+    "day_count": 1,
+    "my_trades": [],
+    "vol_since_last_blink": 32.257586329999995,
+    "strategy": {
+        "name": "arb",
+        "description": "Exploit the arbitrage oportunities"
+    },
+    "last_day": "d17521",
+    "period": {
+        "period_id": "15s100926666",
+        "size": "15s",
+        "time": 1513899990000,
+        "open": 0.05082575,
+        "high": 0.05083222,
+        "low": 0.05082575,
+        "close": 0.05083222,
+        "volume": 32.257586329999995,
+        "close_time": 1513900004000
+    },
+    "in_preroll": true,
+    "arb": {},
+    "last_period_id": "15s100926666"
+}

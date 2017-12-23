@@ -5,3 +5,5 @@ node zenbot sim poloniex.ETH-BTC --strategy trend_ema --asset_capital 0 --curren
 node zenbot sim --conf ./config.simulation.js
 
 node scripts/genetic_backtester/darwin.js --selector=poloniex.ETH-BTC --days=7 --currency_capital=0.009 --asset_capital=0
+
+node zenbot trade --conf ./config.arb.poloniex.js --paper=true

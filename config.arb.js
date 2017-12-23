@@ -1,4 +1,4 @@
-let c = module.exports = require('./config');
+let c = require('./config');
 
 c.selector = 'poloniex.ETH-BTC';
 c.strategy = 'arb';
@@ -21,3 +21,5 @@ c.sell_stop_pct = 0;
 c.period = '15s';
 
 c.paper = true;
+
+module.exports = c;
