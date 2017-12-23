@@ -5,6 +5,12 @@ const selectors = [
   'kraken.XETH-XXBT'
 ];
 
+const signals = {
+  buy: 'buy',
+  sell: 'sell',
+  hold: null
+};
+
 function getTimestamp() {
   var d = new Date();
   return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
@@ -29,17 +35,13 @@ module.exports = function container(get, set, clear) {
 
         s.arb = {};
       }
-
-      console.log('arb calculate');
     },
 
     onPeriod: function (s, cb) {
-      console.log('arb onPeriod');
-      
       const myRate = s.period.close;
       const savingPromise = storage.setLastRate(mySelector, myRate);
 
-      s.signal = null;
+      s.signal = signals.hold;
 
       const signalPromise = storage.getLastRate(otherSelector)
         .then(otherRate => {
@@ -53,16 +55,22 @@ module.exports = function container(get, set, clear) {
             return;
           }
 
-          let high, low;
+          let high, low, signal;
           if (myRate > otherRate) {
             high = myRate;
             low = otherRate;
+            signal = signals.sell;
           } else {
             high = otherRate;
             low = myRate;
+            signal = signals.buy;
           }
-          const diff = high - low;;
+          const diff = myRate - otherRate;
           const relativeDiff = diff / high;
+
+          if ((high - low)/high > 0.002) {
+            s.signal = signal;
+          }
 
           s.arb = {
             myRate,
@@ -77,8 +85,9 @@ module.exports = function container(get, set, clear) {
 
     onReport: function (s) {
       const { myRate, otherRate, diff, relativeDiff } = s.arb;
-      var rep = `\n${mySelector}\t${myRate}\t${otherRate}\t${diff}\t${relativeDiff * 100}`;
-      return [rep];
+      var rep = `\n${mySelector}\t${myRate}\t${otherRate}\t${diff}\t${relativeDiff * 100}%`;
+      var balance = `\nETH: ${s.balance.asset}\tBTC: ${s.balance.currency}`;
+      return [rep, balance];
 
       // var cols = [mySelector, myRate, otherRate, diff, relativeDiff];
 
