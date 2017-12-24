@@ -1,15 +1,23 @@
 const storage = require('./storage');
 
-const selectors = [
-  'poloniex.ETH-BTC',
-  'kraken.XETH-XXBT'
-];
-
 const signals = {
   buy: 'buy',
   sell: 'sell',
   hold: null
 };
+
+const selectors = [
+  {
+    key: 'poloniex.ETH-BTC',
+    [signals.buy]: 0.0025,
+    [signals.sell]: 0.006
+  },
+  {
+    key: 'kraken.XETH-XXBT',
+    [signals.buy]: 0.006,
+    [signals.sell]: 0.0025
+  }
+];
 
 function getTimestamp() {
   var d = new Date();
@@ -30,20 +38,25 @@ module.exports = function container(get, set, clear) {
 
     calculate: function (s) {
       if (!s.arb) {
-        mySelector = s.selector;
-        otherSelector = selectors[0] === mySelector ? selectors[1] : selectors[0];
-
+        if (s.selector === selectors[0].key){
+          mySelector = selectors[0];
+          otherSelector = selectors[1];
+        } else {
+          mySelector = selectors[1];
+          otherSelector = selectors[0];
+        }
+        
         s.arb = {};
       }
     },
 
     onPeriod: function (s, cb) {
       const myRate = s.period.close;
-      const savingPromise = storage.setLastRate(mySelector, myRate);
+      const savingPromise = storage.setLastRate(mySelector.key, myRate);
 
       s.signal = signals.hold;
 
-      const signalPromise = storage.getLastRate(otherSelector)
+      const signalPromise = storage.getLastRate(otherSelector.key)
         .then(otherRate => {
           if (!otherRate) {
             s.arb = {
@@ -69,7 +82,7 @@ module.exports = function container(get, set, clear) {
           const relativeDiff = diff / high;
           const absDiff = Math.abs(relativeDiff);
 
-          if (absDiff > 0.004) {
+          if (absDiff > mySelector[signal]) {
             s.signal = signal;
           }
 
@@ -86,7 +99,7 @@ module.exports = function container(get, set, clear) {
 
     onReport: function (s) {
       const { myRate, otherRate, diff, relativeDiff } = s.arb;
-      var rep = `\n${mySelector}\t${myRate}\t${otherRate}\t${diff}\t${relativeDiff * 100}%`;
+      var rep = `\n${mySelector.key}\t${myRate}\t${otherRate}\t${diff}\t${relativeDiff * 100}%`;
       var balance = `\nETH: ${s.balance.asset}\tBTC: ${s.balance.currency}`;
       return [rep, balance];
 

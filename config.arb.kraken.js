@@ -1,5 +1,3 @@
-let c = require('./config.arb');
+let c = module.exports = require('./config.arb');
 
 c.selector = 'kraken.XETH-XXBT';
-
-module.exports = c;

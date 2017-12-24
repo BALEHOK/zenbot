@@ -34,6 +34,7 @@ module.exports = function (cb) {
     if (err) {
       zenbot.set('zenbot:db.mongo', null)
       console.error('warning: mongodb not accessible. some features (such as backfilling/simulation) may be disabled.')
+      console.log('tried to connect to', u)
       return withMongo()
     }
     zenbot.set('zenbot:db.mongo', db)

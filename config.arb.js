@@ -1,12 +1,10 @@
-let c = module.exports = require('./config');
+let c = module.exports = require('./config_defaults');
 
 c.selector = 'poloniex.ETH-BTC';
 c.strategy = 'arb';
-c.paper = true;
+// c.paper = true;
 
-c.asset_capital = 0;
 c.avg_slippage_pct = 0.045;
-c.currency_capital = 0.009;
 c.days = 2;
 c.buy_pct = 100;
 c.buy_stop_pct = 0;

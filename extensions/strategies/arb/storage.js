@@ -1,7 +1,8 @@
 const util = require('util');
 
 const Memcached = require('memcached');
-const memcached = new Memcached('127.0.0.1:11211');
+// const memcached = new Memcached('127.0.0.1:11211');
+const memcached = new Memcached('192.168.99.100:11211');
 
 const get = util.promisify(memcached.get).bind(memcached);
 const set = util.promisify(memcached.set).bind(memcached);
