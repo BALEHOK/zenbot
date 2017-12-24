@@ -27,6 +27,8 @@ function getTimestamp() {
 module.exports = function container(get, set, clear) {
   let mySelector, otherSelector;
 
+  const trades = get('db.createCollection')('arb_trades');
+
   return {
     name: 'arb',
     description: 'Exploit the arbitrage oportunities',
@@ -89,9 +91,11 @@ module.exports = function container(get, set, clear) {
           s.arb = {
             myRate,
             otherRate,
-            diff: absDiff,
+            diff,
             relativeDiff
           }
+
+          trades.save(s.arb, () => {});
         });
       
       Promise.all([savingPromise, signalPromise]).then(cb);
@@ -100,8 +104,7 @@ module.exports = function container(get, set, clear) {
     onReport: function (s) {
       const { myRate, otherRate, diff, relativeDiff } = s.arb;
       var rep = `\n${mySelector.key}\t${myRate}\t${otherRate}\t${diff}\t${relativeDiff * 100}%`;
-      var balance = `\nETH: ${s.balance.asset}\tBTC: ${s.balance.currency}`;
-      return [rep, balance];
+      return [rep];
 
       // var cols = [mySelector, myRate, otherRate, diff, relativeDiff];
 

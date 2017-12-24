@@ -2,7 +2,7 @@ let c = module.exports = require('./config_defaults');
 
 c.selector = 'poloniex.ETH-BTC';
 c.strategy = 'arb';
-// c.paper = true;
+c.paper = true;
 
 c.avg_slippage_pct = 0.045;
 c.days = 2;
@@ -14,9 +14,9 @@ c.max_slippage_pct = 2;
 c.order_adjust_time = 3000;
 // become a market taker (high fees) or a market maker (low fees)
 c.order_type = 'taker';
-c.period = '30s';
+c.period = '15s';
 // ms to poll new trades at
-c.poll_trades = 15000;
+c.poll_trades = 13000;
 c.profit_stop_enable_pct = 0;
 c.profit_stop_pct = 0;
 c.rsi_periods = 14;
