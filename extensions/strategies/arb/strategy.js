@@ -26,8 +26,9 @@ function getTimestamp() {
 
 module.exports = function container(get, set, clear) {
   let mySelector, otherSelector;
+  let arbTrades;
 
-  const trades = get('db.createCollection')('arb_trades');
+  arbTrades = get('db.createCollection')('arb_rates');
 
   return {
     name: 'arb',
@@ -40,14 +41,14 @@ module.exports = function container(get, set, clear) {
 
     calculate: function (s) {
       if (!s.arb) {
-        if (s.selector === selectors[0].key){
+        if (s.selector === selectors[0].key) {
           mySelector = selectors[0];
           otherSelector = selectors[1];
         } else {
           mySelector = selectors[1];
           otherSelector = selectors[0];
         }
-        
+
         s.arb = {};
       }
     },
@@ -62,6 +63,7 @@ module.exports = function container(get, set, clear) {
         .then(otherRate => {
           if (!otherRate) {
             s.arb = {
+              selector: mySelector.key,
               myRate,
               otherRate: '-',
               diff: '-',
@@ -89,21 +91,23 @@ module.exports = function container(get, set, clear) {
           }
 
           s.arb = {
+            id: `${mySelector.key}_${getTimestamp()}`,
+            selector: mySelector.key,
             myRate,
             otherRate,
             diff,
             relativeDiff
           }
 
-          trades.save(s.arb, () => {});
+          arbTrades.save(s.arb, (err) => { if (err) console.log('failed to save arbitrage trade', err) });
         });
-      
+
       Promise.all([savingPromise, signalPromise]).then(cb);
     },
 
     onReport: function (s) {
-      const { myRate, otherRate, diff, relativeDiff } = s.arb;
-      var rep = `\n${mySelector.key}\t${myRate}\t${otherRate}\t${diff}\t${relativeDiff * 100}%`;
+      const { selector, myRate, otherRate, diff, relativeDiff } = s.arb;
+      var rep = `\n${selector}\t${myRate}\t${otherRate}\t${diff}\t${typeof relativeDiff === 'number' ? relativeDiff * 100 : relativeDiff}%`;
       return [rep];
 
       // var cols = [mySelector, myRate, otherRate, diff, relativeDiff];
