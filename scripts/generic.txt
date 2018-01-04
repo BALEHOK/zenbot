@@ -1,3 +1,7 @@
+// deployment
+docker run --network baby_nw -e MONGODB_PORT_27017_TCP_ADDR=mongo launchery/zen:arb-0.0.1 trade --conf ./config.arb.poloniex.js --paper=true
+
+// run trading
 node zenbot backfill poloniex.ETH-BTC --days 2
 
 node zenbot sim poloniex.ETH-BTC --strategy trend_ema --asset_capital 0 --currency_capital 0.009 --days 2 --avg_slippage_pct 0.045 --buy_pct 100 --buy_stop_pct 0 --markup_pct 1 --max_sell_loss_pct 3.8 --max_slippage_pct 2 --order_adjust_time 5000 --order_type maker --profit_stop_enable_pct 3 --profit_stop_pct 0 --rsi_periods 14 --sell_pct 100 --sell_stop_pct 0 --min_periods 36 --neutral_rate 0.022146410918640832 --oversold_rsi 22 --oversold_rsi_periods 30 --period 2m --trend_ema 50
