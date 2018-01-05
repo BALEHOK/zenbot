@@ -10,11 +10,11 @@ const selectors = [
   {
     key: 'poloniex.ETH-BTC',
     [signals.buy]: 0.0025,
-    [signals.sell]: 0.006
+    [signals.sell]: 0.01
   },
   {
     key: 'kraken.XETH-XXBT',
-    [signals.buy]: 0.006,
+    [signals.buy]: 0.01,
     [signals.sell]: 0.0025
   }
 ];
