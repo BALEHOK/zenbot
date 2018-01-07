@@ -1,7 +1,7 @@
 // deployment
 docker run --name memcached --network baby_nw -d --restart unless-stopped memcached:alpine
 
-docker build -t launchery/zen:arb-x.y.z
+docker build -t launchery/zen:arb-x.y.z .
 docker run --network baby_nw -e MONGODB_PORT_27017_TCP_ADDR=mongo -e MEMCACHED_TCP_ADDR=memcached launchery/zen:arb-0.0.2 trade --conf ./config.arb.poloniex.js --paper=true
 
 // run trading
