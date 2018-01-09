@@ -20,9 +20,12 @@ sim_result*
 trade_result*
 *_test
 backtesting_*
+generation_data_*
 models/*.json
 models/*.html
 *.pyc
 *.swp
 temp.html
 logs
+.sync
+dist/*
