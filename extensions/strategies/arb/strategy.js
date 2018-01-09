@@ -97,7 +97,7 @@ module.exports = function container(get, set, clear) {
             otherRate,
             diff,
             relativeDiff,
-            signal
+            signal: s.signal
           }
 
           arbTrades.save(s.arb, (err) => { if (err) console.log('failed to save arbitrage trade', err) });

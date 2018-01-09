@@ -108,8 +108,6 @@ module.exports = function container (get, set, clear) {
           return retry('getBalance', args)
         }
         if (body[opts.currency]) {
-          console.log('balance', body[opts.currency]);
-          
           balance.currency = n(body[opts.currency].available).add(body[opts.currency].onOrders).format('0.00000000')
           balance.currency_hold = body[opts.currency].onOrders
         }
