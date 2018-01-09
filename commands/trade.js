@@ -56,7 +56,8 @@ module.exports = function container (get, set, clear) {
         })
         so.debug = cmd.debug
         so.stats = !cmd.disable_stats
-        so.mode = so.paper ? 'paper' : 'live'
+
+        so.mode = (so.paper && so.paper !== 'false') ? 'paper' : 'live'
         if (cmd.conf) {
           var overrides = require(path.resolve(process.cwd(), cmd.conf))
           Object.keys(overrides).forEach(function (k) {
