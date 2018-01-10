@@ -47,7 +47,8 @@ module.exports = function container (get) {
     });
 
     app.listen(port)
-    tradeObject.url = require('ip').address() + ':' + port + '/'
+    // tradeObject.url = require('ip').address() + ':' + port + '/'
+    tradeObject.url = 'localhost:' + port + '/'
     console.log('Web GUI running on http://' + tradeObject.url)
   }
 

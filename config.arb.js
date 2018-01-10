@@ -1,5 +1,15 @@
 let c = module.exports = require('./config_defaults');
 
+let apiConf;
+try {
+  apiConf = require('./conf')
+} catch (ee) {
+  apiConf = {}
+}
+Object.keys(apiConf).forEach(function (k) {
+  c[k] = apiConf[k]
+});
+
 c.selector = 'poloniex.ETH-BTC';
 c.strategy = 'arb';
 c.paper = true;

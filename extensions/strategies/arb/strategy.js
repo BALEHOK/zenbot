@@ -107,8 +107,8 @@ module.exports = function container(get, set, clear) {
     },
 
     onReport: function (s) {
-      const { selector, myRate, otherRate, diff, relativeDiff } = s.arb;
-      var rep = `\n${selector}\t${myRate}\t${otherRate}\t${diff}\t${typeof relativeDiff === 'number' ? relativeDiff * 100 : relativeDiff}%`;
+      const { selector, myRate, otherRate, diff, relativeDiff, signal } = s.arb;
+      var rep = `\n${selector}\t${myRate}\t${otherRate}\t${typeof relativeDiff === 'number' ? relativeDiff * 100 : relativeDiff}%\t${signal}`;
       return [rep];
 
       // var cols = [mySelector, myRate, otherRate, diff, relativeDiff];
