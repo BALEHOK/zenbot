@@ -6,16 +6,19 @@ const signals = {
   hold: null
 };
 
+const poloSell = 0.02;
+const krakenSell = 0.005;
+
 const selectors = [
   {
     key: 'poloniex.ETH-BTC',
-    [signals.buy]: 0.0025,
-    [signals.sell]: 0.01
+    [signals.buy]: krakenSell,
+    [signals.sell]: poloSell
   },
   {
     key: 'kraken.XETH-XXBT',
-    [signals.buy]: 0.01,
-    [signals.sell]: 0.0025
+    [signals.buy]: poloSell,
+    [signals.sell]: krakenSell
   }
 ];
 
@@ -41,7 +44,7 @@ module.exports = function container(get, set, clear) {
 
     calculate: function (s) {
       if (!s.arb) {
-        if (s.selector === selectors[0].key) {
+        if (s.options.selector.normalized === selectors[0].key) {
           mySelector = selectors[0];
           otherSelector = selectors[1];
         } else {
@@ -67,7 +70,8 @@ module.exports = function container(get, set, clear) {
               myRate,
               otherRate: '-',
               diff: '-',
-              relativeDiff: '-'
+              relativeDiff: '-',
+              signal: s.signal
             }
             return;
           }
@@ -108,12 +112,8 @@ module.exports = function container(get, set, clear) {
 
     onReport: function (s) {
       const { selector, myRate, otherRate, diff, relativeDiff, signal } = s.arb;
-      var rep = `\n${selector}\t${myRate}\t${otherRate}\t${typeof relativeDiff === 'number' ? relativeDiff * 100 : relativeDiff}%\t${signal}`;
+      var rep = `\n${selector}\t${myRate}\t${otherRate}\t${typeof relativeDiff === 'number' ? (((relativeDiff * 1000000) | 0)/10000) : relativeDiff}%\t${signal}`;
       return [rep];
-
-      // var cols = [mySelector, myRate, otherRate, diff, relativeDiff];
-
-      // return cols;
     }
   };
 }

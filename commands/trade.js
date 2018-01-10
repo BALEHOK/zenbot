@@ -51,7 +51,7 @@ module.exports = function container (get, set, clear) {
         var so = s.options
         delete so._
         Object.keys(c).forEach(function (k) {
-          if (typeof cmd[k] !== 'undefined') {
+          if (typeof cmd[k] !== 'undefined' && typeof so[k] === 'undefined') {
             so[k] = cmd[k]
           }
         })
