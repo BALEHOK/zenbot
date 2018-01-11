@@ -7,18 +7,32 @@ const signals = {
 };
 
 const poloSell = 0.02;
+const quadrigaSell = 0.005;
 const krakenSell = 0.005;
+
+// const selectors = [
+//   {
+//     key: 'poloniex.ETH-BTC',
+//     [signals.buy]: krakenSell,
+//     [signals.sell]: poloSell
+//   },
+//   {
+//     key: 'kraken.XETH-XXBT',
+//     [signals.buy]: poloSell,
+//     [signals.sell]: krakenSell
+//   }
+// ];
 
 const selectors = [
   {
     key: 'poloniex.ETH-BTC',
-    [signals.buy]: krakenSell,
+    [signals.buy]: quadrigaSell,
     [signals.sell]: poloSell
   },
   {
-    key: 'kraken.XETH-XXBT',
+    key: 'quadriga.ETH-BTC',
     [signals.buy]: poloSell,
-    [signals.sell]: krakenSell
+    [signals.sell]: quadrigaSell
   }
 ];
 
@@ -61,9 +75,13 @@ module.exports = function container(get, set, clear) {
       const savingPromise = storage.setLastRate(mySelector.key, myRate);
 
       s.signal = signals.hold;
+      let testSignal = signals.hold;
 
       const signalPromise = storage.getLastRate(otherSelector.key)
         .then(otherRate => {
+          console.log('saving', mySelector.key, myRate)
+          console.log('receiving', otherSelector.key, otherRate)
+
           if (!otherRate) {
             s.arb = {
               selector: mySelector.key,
@@ -71,7 +89,7 @@ module.exports = function container(get, set, clear) {
               otherRate: '-',
               diff: '-',
               relativeDiff: '-',
-              signal: s.signal
+              signal: testSignal
             }
             return;
           }
@@ -92,6 +110,7 @@ module.exports = function container(get, set, clear) {
 
           if (absDiff > mySelector[signal]) {
             s.signal = signal;
+            testSignal = signal;
           }
 
           s.arb = {
@@ -101,13 +120,12 @@ module.exports = function container(get, set, clear) {
             otherRate,
             diff,
             relativeDiff,
-            signal: s.signal
-          }
+            signal: testSignal
+          };
 
           arbTrades.save(s.arb, (err) => { if (err) console.log('failed to save arbitrage trade', err) });
-        });
-
-      Promise.all([savingPromise, signalPromise]).then(cb);
+        })
+        .then(cb);
     },
 
     onReport: function (s) {

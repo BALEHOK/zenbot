@@ -12,7 +12,7 @@ function getLastRate(key) {
 }
 
 function setLastRate(key, value) {
-  return set(key, value, 60);
+  return set(key, value, 30);
 }
 
 module.exports = {
