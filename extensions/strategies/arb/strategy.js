@@ -7,34 +7,35 @@ const signals = {
 };
 
 const poloSell = 0.02;
-const quadrigaSell = 0.005;
 const krakenSell = 0.005;
-
-// const selectors = [
-//   {
-//     key: 'poloniex.ETH-BTC',
-//     [signals.buy]: krakenSell,
-//     [signals.sell]: poloSell
-//   },
-//   {
-//     key: 'kraken.XETH-XXBT',
-//     [signals.buy]: poloSell,
-//     [signals.sell]: krakenSell
-//   }
-// ];
-
 const selectors = [
   {
     key: 'poloniex.ETH-BTC',
-    [signals.buy]: quadrigaSell,
+    [signals.buy]: krakenSell,
     [signals.sell]: poloSell
   },
   {
-    key: 'quadriga.ETH-BTC',
+    key: 'kraken.XETH-XXBT',
     [signals.buy]: poloSell,
-    [signals.sell]: quadrigaSell
+    [signals.sell]: krakenSell
   }
 ];
+
+
+// const poloSell = 0.02;
+// const quadrigaSell = 0.005;
+// const selectors = [
+//   {
+//     key: 'poloniex.ETH-BTC',
+//     [signals.buy]: quadrigaSell,
+//     [signals.sell]: poloSell
+//   },
+//   {
+//     key: 'quadriga.ETH-BTC',
+//     [signals.buy]: poloSell,
+//     [signals.sell]: quadrigaSell
+//   }
+// ];
 
 function getTimestamp() {
   var d = new Date();
