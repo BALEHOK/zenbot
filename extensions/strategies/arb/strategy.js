@@ -6,36 +6,33 @@ const signals = {
   hold: null
 };
 
-const poloSell = 0.02;
-const krakenSell = 0.005;
-const selectors = [
-  {
-    key: 'poloniex.ETH-BTC',
-    [signals.buy]: krakenSell,
-    [signals.sell]: poloSell
-  },
-  {
-    key: 'kraken.XETH-XXBT',
-    [signals.buy]: poloSell,
-    [signals.sell]: krakenSell
-  }
+const selectors = {
+  poloniex: 'poloniex.ETH-BTC',
+  kraken: 'kraken.XETH-XXBT',
+  quadriga: 'quadriga.ETH-BTC'
+}
+
+const excahnges = [
+  [
+    {
+      key: selectors.poloniex,
+      sellTreshold: 0.01,
+    },
+    {
+      key: selectors.kraken,
+      sellTreshold: 0.005,
+    }
+  ], [
+    {
+      key: selectors.poloniex,
+      sellTreshold: 0.02,
+    },
+    {
+      key: selectors.quadriga,
+      sellTreshold: 0.005,
+    }
+  ]
 ];
-
-
-// const poloSell = 0.02;
-// const quadrigaSell = 0.005;
-// const selectors = [
-//   {
-//     key: 'poloniex.ETH-BTC',
-//     [signals.buy]: quadrigaSell,
-//     [signals.sell]: poloSell
-//   },
-//   {
-//     key: 'quadriga.ETH-BTC',
-//     [signals.buy]: poloSell,
-//     [signals.sell]: quadrigaSell
-//   }
-// ];
 
 function getTimestamp() {
   var d = new Date();
@@ -43,7 +40,7 @@ function getTimestamp() {
 }
 
 module.exports = function container(get, set, clear) {
-  let mySelector, otherSelector;
+  let myExchange, otherExchange;
   let arbTrades;
 
   arbTrades = get('db.createCollection')('arb_rates');
@@ -55,37 +52,47 @@ module.exports = function container(get, set, clear) {
     getOptions: function () {
       this.option('period', 'period length', String, '30s');
       this.option('min_periods', 'min. number of history periods', Number, 52);
+      this.option('otherSelector', 'specify the other selector for arbitrage', String, 'none');
+
+      if (!s.options || !s.options.otherSelector) {
+        console.error('specify the other selector for arbitrage');
+        process.exit(1);
+      }
+
+      mySelector = s.options.selector.normalized;
+      otherSelector = s.options.otherSelector;
+
+      excahnges.forEach(pair => {
+        const ex1 = pair[0];
+        const ex2 = pair[1];
+        if (ex1.key === mySelector && ex2.key === otherSelector) {
+          myExchange = ex1;
+          otherExchange = ex2;
+        } else if (ex1.key === otherSelector && ex2.key === mySelector) {
+          myExchange = ex2;
+          otherExchange = ex1;
+        }
+      })
     },
 
     calculate: function (s) {
-      if (!s.arb) {
-        if (s.options.selector.normalized === selectors[0].key) {
-          mySelector = selectors[0];
-          otherSelector = selectors[1];
-        } else {
-          mySelector = selectors[1];
-          otherSelector = selectors[0];
-        }
-
-        s.arb = {};
-      }
     },
 
     onPeriod: function (s, cb) {
       const myRate = s.period.close;
-      const savingPromise = storage.setLastRate(mySelector.key, myRate);
+      const savingPromise = storage.setLastRate(myExchange.key, myRate);
 
       s.signal = signals.hold;
       let testSignal = signals.hold;
 
-      const signalPromise = storage.getLastRate(otherSelector.key)
+      const signalPromise = storage.getLastRate(otherExchange.key)
         .then(otherRate => {
-          console.log('saving', mySelector.key, myRate)
-          console.log('receiving', otherSelector.key, otherRate)
+          // console.log('saving', myExchange.key, myRate)
+          // console.log('receiving', otherExchange.key, otherRate)
 
           if (!otherRate) {
             s.arb = {
-              selector: mySelector.key,
+              selector: myExchange.key,
               myRate,
               otherRate: '-',
               diff: '-',
@@ -95,28 +102,27 @@ module.exports = function container(get, set, clear) {
             return;
           }
 
-          let high, low, signal;
-          if (myRate > otherRate) {
-            high = myRate;
-            low = otherRate;
-            signal = signals.sell;
-          } else {
-            high = otherRate;
-            low = myRate;
-            signal = signals.buy;
-          }
           const diff = myRate - otherRate;
           const relativeDiff = diff / high;
           const absDiff = Math.abs(relativeDiff);
 
-          if (absDiff > mySelector[signal]) {
+          let signal, operatinThreshold;
+          if (myRate > otherRate) {
+            signal = signals.sell;
+            operatinThreshold = myExchange.sellTreshold;
+          } else {
+            signal = signals.buy;
+            operatinThreshold = otherExchange.sellTreshold;
+          }
+
+          if (absDiff > operatinThreshold) {
             s.signal = signal;
             testSignal = signal;
           }
 
           s.arb = {
-            id: `${mySelector.key}_${getTimestamp()}`,
-            selector: mySelector.key,
+            id: `${myExchange.key}_${getTimestamp()}`,
+            selector: myExchange.key,
             myRate,
             otherRate,
             diff,
@@ -131,7 +137,7 @@ module.exports = function container(get, set, clear) {
 
     onReport: function (s) {
       const { selector, myRate, otherRate, diff, relativeDiff, signal } = s.arb;
-      var rep = `\n${selector}\t${myRate}\t${otherRate}\t${typeof relativeDiff === 'number' ? (((relativeDiff * 1000000) | 0)/10000) : relativeDiff}%\t${signal}`;
+      var rep = `\n${selector}\t${myRate}\t${otherRate}\t${typeof relativeDiff === 'number' ? (((relativeDiff * 1000000) | 0) / 10000) : relativeDiff}%\t${signal}`;
       return [rep];
     }
   };
