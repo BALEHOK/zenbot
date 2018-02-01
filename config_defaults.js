@@ -4,7 +4,7 @@ var c = {}
 c.mongo = {}
 c.mongo.host = process.env.MONGODB_PORT_27017_TCP_ADDR || 'localhost'
 c.mongo.port = 27017
-c.mongo.db = 'zenbot4_kraken'
+c.mongo.db = 'zenbot4'
 c.mongo.username = null
 c.mongo.password = null
 // when using mongodb replication, i.e. when running a mongodb cluster, you can define your replication set here; when you are not using replication (most of the users), just set it to `null` (default).

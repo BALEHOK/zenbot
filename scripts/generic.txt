@@ -8,9 +8,22 @@ docker run --network baby_nw -e MONGODB_PORT_27017_TCP_ADDR=mongo -e MEMCACHED_T
 node zenbot backfill poloniex.ETH-BTC --days 2
 
 node zenbot sim poloniex.ETH-BTC --strategy trend_ema --asset_capital 0 --currency_capital 0.009 --days 2 --avg_slippage_pct 0.045 --buy_pct 100 --buy_stop_pct 0 --markup_pct 1 --max_sell_loss_pct 3.8 --max_slippage_pct 2 --order_adjust_time 5000 --order_type maker --profit_stop_enable_pct 3 --profit_stop_pct 0 --rsi_periods 14 --sell_pct 100 --sell_stop_pct 0 --min_periods 36 --neutral_rate 0.022146410918640832 --oversold_rsi 22 --oversold_rsi_periods 30 --period 2m --trend_ema 50
-
 node zenbot sim --conf ./config.simulation.js
-
 node scripts/genetic_backtester/darwin.js --selector=poloniex.ETH-BTC --days=7 --currency_capital=0.009 --asset_capital=0
 
-node zenbot trade --conf ./config.arb.poloniex.js --paper=true
+// arb
+node zenbot trade --conf ./config.arb.poloniex.js --otherSelector quadriga.ETH-BTC --paper
+node zenbot trade --conf ./config.arb.quadriga.js --otherSelector poloniex.ETH-BTC --paper
+
+// server update
+$VERSION=1.0.2
+docker ps -a | grep launchery/zen:arb | awk '{print $1}' | xargs docker rm
+docker rmi launchery/zen:arb-latest
+docker pull launchery/zen:arb-$VERSION
+docker tag launchery/zen:arb-$VERSION launchery/zen:arb-latest
+cd /home/alex/zen
+docker build -t launchery/zen:arb-trade-$VERSION .
+
+// start trading container
+docker run --network baby_nw --restart unless-stopped -e MONGODB_PORT_27017_TCP_ADDR=mongo -e MEMCACHED_TCP_ADDR=memcached -d -t launchery/zen:arb-trade-$VERSION trade --conf ./config.arb.poloniex.js  --otherSelector kraken.XETH-XXBT --paper
+docker run --network baby_nw --restart unless-stopped -e MONGODB_PORT_27017_TCP_ADDR=mongo -e MEMCACHED_TCP_ADDR=memcached -d -t launchery/zen:arb-trade-$VERSION trade --conf ./config.arb.kraken.js  --otherSelector poloniex.ETH-BTC --paper

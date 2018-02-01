@@ -15,7 +15,8 @@ c.strategy = 'arb';
 c.paper = true;
 
 c.avg_slippage_pct = 0.045;
-c.days = 2;
+c.days = 1;
+c.rsi_periods = 5
 c.buy_pct = 100;
 c.buy_stop_pct = 0;
 c.markup_pct = 1;

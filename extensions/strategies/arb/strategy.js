@@ -51,34 +51,17 @@ module.exports = function container(get, set, clear) {
 
     getOptions: function () {
       this.option('period', 'period length', String, '30s');
-      this.option('min_periods', 'min. number of history periods', Number, 52);
       this.option('otherSelector', 'specify the other selector for arbitrage', String, 'none');
-
-      if (!s.options || !s.options.otherSelector) {
-        console.error('specify the other selector for arbitrage');
-        process.exit(1);
-      }
-
-      mySelector = s.options.selector.normalized;
-      otherSelector = s.options.otherSelector;
-
-      excahnges.forEach(pair => {
-        const ex1 = pair[0];
-        const ex2 = pair[1];
-        if (ex1.key === mySelector && ex2.key === otherSelector) {
-          myExchange = ex1;
-          otherExchange = ex2;
-        } else if (ex1.key === otherSelector && ex2.key === mySelector) {
-          myExchange = ex2;
-          otherExchange = ex1;
-        }
-      })
     },
 
     calculate: function (s) {
     },
 
     onPeriod: function (s, cb) {
+      if (!s.arb) {
+        init(s);
+      }
+
       const myRate = s.period.close;
       const savingPromise = storage.setLastRate(myExchange.key, myRate);
 
@@ -103,18 +86,20 @@ module.exports = function container(get, set, clear) {
           }
 
           const diff = myRate - otherRate;
-          const relativeDiff = diff / high;
-          const absDiff = Math.abs(relativeDiff);
+          let relativeDiff;
 
           let signal, operatinThreshold;
           if (myRate > otherRate) {
             signal = signals.sell;
             operatinThreshold = myExchange.sellTreshold;
+            relativeDiff = diff / myRate;
           } else {
             signal = signals.buy;
             operatinThreshold = otherExchange.sellTreshold;
+            relativeDiff = diff / otherRate;
           }
 
+          const absDiff = Math.abs(relativeDiff);
           if (absDiff > operatinThreshold) {
             s.signal = signal;
             testSignal = signal;
@@ -136,9 +121,35 @@ module.exports = function container(get, set, clear) {
     },
 
     onReport: function (s) {
+      if (!s.arb) {
+        return [];
+      }
+
       const { selector, myRate, otherRate, diff, relativeDiff, signal } = s.arb;
       var rep = `\n${selector}\t${myRate}\t${otherRate}\t${typeof relativeDiff === 'number' ? (((relativeDiff * 1000000) | 0) / 10000) : relativeDiff}%\t${signal}`;
       return [rep];
     }
   };
+
+  function init(s) {
+    if (!s.options || !s.options.otherSelector) {
+      console.error('specify the other selector for arbitrage');
+      process.exit(1);
+    }
+
+    mySelector = s.options.selector.normalized;
+    otherSelector = s.options.otherSelector;
+
+    excahnges.forEach(pair => {
+      const ex1 = pair[0];
+      const ex2 = pair[1];
+      if (ex1.key === mySelector && ex2.key === otherSelector) {
+        myExchange = ex1;
+        otherExchange = ex2;
+      } else if (ex1.key === otherSelector && ex2.key === mySelector) {
+        myExchange = ex2;
+        otherExchange = ex1;
+      }
+    });
+  }
 }
